@@ -76,7 +76,11 @@ fun acceptUntrustedCertificates() {
  * space is greater than that setting
  * Returns true otherwise
  */
-fun insufficientSpace(applicationContext: Context, contentLength: Long): Boolean {
+fun insufficientSpace(
+    applicationContext: Context,
+    contentLength: Long,
+    directory: File? = null
+): Boolean {
     if (contentLength <= 0) {
         return false
     }
@@ -85,7 +89,7 @@ fun insufficientSpace(applicationContext: Context, contentLength: Long): Boolean
     if (checkValue <= 0) {
         return false
     }
-    val path = Environment.getDataDirectory()
+    val path = directory ?: Environment.getDataDirectory()
     val stat = StatFs(path.path)
     val available = stat.blockSizeLong * stat.availableBlocksLong
     return available - (BDPlugin.remainingBytesToDownload.values.sum()

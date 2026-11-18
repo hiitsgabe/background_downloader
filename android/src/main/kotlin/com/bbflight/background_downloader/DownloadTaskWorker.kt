@@ -125,7 +125,34 @@ class DownloadTaskWorker(applicationContext: Context, workerParams: WorkerParame
             extractContentType(connection.headerFields)
             val contentLength = getContentLength(connection.headerFields, task)
             // determine tempFile, or set to null if Uri is used
-            val tempFile = if (!usesUri) {
+            val useDestinationDir = !usesUri &&
+                    PreferenceManager.getDefaultSharedPreferences(applicationContext)
+                        .getInt(BDPlugin.keyConfigUseDestinationDir, -1) == 0
+            val tempFile = if (useDestinationDir) {
+                // Write the partial file next to its destination, so that the
+                // final move is a rename on the same volume instead of a copy
+                // out of internal storage
+                val destFile = File(destFilePath)
+                val tempDir = destFile.parentFile!!
+                if (!tempDir.exists()) {
+                    tempDir.mkdirs()
+                }
+                tempFilePath = tempFilePath.ifEmpty {
+                    "${tempDir.absolutePath}/.${destFile.name}.${Random.nextInt().absoluteValue}.part"
+                }
+                if (insufficientSpace(applicationContext, contentLength, tempDir)) {
+                    Log.i(
+                        TAG,
+                        "Insufficient space to store the file to be downloaded for taskId ${task.taskId}"
+                    )
+                    taskException = TaskException(
+                        ExceptionType.fileSystem,
+                        description = "Insufficient space to store the file to be downloaded"
+                    )
+                    return TaskStatus.failed
+                }
+                File(tempFilePath)
+            } else if (!usesUri) {
                 val applicationSupportPath =
                     baseDirPath(applicationContext, BaseDirectory.applicationSupport)
                 val cachePath = baseDirPath(applicationContext, BaseDirectory.temporary)

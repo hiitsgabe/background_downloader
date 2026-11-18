@@ -86,6 +86,8 @@ class BDPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         const val keyConfigCheckAvailableSpace =
             "com.bbflight.background_downloader.config.checkAvailableSpace"
         const val keyConfigUseCacheDir = "com.bbflight.background_downloader.config.useCacheDir"
+        const val keyConfigUseDestinationDir =
+            "com.bbflight.background_downloader.config.useDestinationDir"
         const val keyConfigUseExternalStorage =
             "com.bbflight.background_downloader.config.useExternalStorage"
 
@@ -512,6 +514,7 @@ class BDPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                     "configBypassTLSCertificateValidation" -> methodConfigBypassTLSCertificateValidation()
                     "configCheckAvailableSpace" -> methodConfigCheckAvailableSpace(call)
                     "configUseCacheDir" -> methodConfigUseCacheDir(call)
+                    "configUseDestinationDir" -> methodConfigUseDestinationDir(call)
                     "configUseExternalStorage" -> methodConfigUseExternalStorage(call)
                     "configHoldingQueue" -> methodConfigHoldingQueue(call)
                     "platformVersion" -> methodPlatformVersion()
@@ -1233,6 +1236,16 @@ class BDPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     private suspend fun methodConfigUseCacheDir(call: MethodCall): Any? {
         withContext(ioScope.coroutineContext) {
             updateSharedPreferences(keyConfigUseCacheDir, call.arguments as Int?)
+        }
+        return null
+    }
+
+    /**
+     * Store the useDestinationDir config in shared preferences
+     */
+    private suspend fun methodConfigUseDestinationDir(call: MethodCall): Any? {
+        withContext(ioScope.coroutineContext) {
+            updateSharedPreferences(keyConfigUseDestinationDir, call.arguments as Int?)
         }
         return null
     }

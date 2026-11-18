@@ -574,6 +574,7 @@ final class Config {
   static const excludeFromCloudBackup = 'excludeFromCloudBackup';
   static const useCacheDir = 'useCacheDir';
   static const useExternalStorage = 'useExternalStorage';
+  static const useDestinationDir = 'useDestinationDir';
   static const holdingQueue = 'holdingQueue';
 
   // Config arguments
